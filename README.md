@@ -1,4 +1,7 @@
-# CopilotKit Frontend Engineering Assessment
+# Zunft Frontend Engineering Assessment
+
+This is Zunft's frontend assignment, based on the CopilotKit ticketing app.
+Choose **one** engineering assignment; you only need to submit one repository.
 
 ## Context
 
@@ -6,9 +9,13 @@ You're receiving a ticketing application built by a previous developer. The app 
 
 Your job is to demonstrate engineering judgment: find and fix bugs systematically, evaluate code critically, and make defensible product decisions when requirements conflict.
 
-**You are expected to use whatever tools you normally use**, including AI coding assistants. How you direct and evaluate automated work is part of what we're assessing.
+## AI tools
 
-## Scope — Tier 1: Core only
+AI tools are allowed. Explain what you delegated, accepted or rejected, and
+how you checked it. Be ready to explain your reasoning and demonstrate the
+changed behavior in a follow-up interview.
+
+## Zunft scope — Tier 1 only
 
 - Investigate and aim to fix the **3 most critical bugs** you find in the application
 - Submit a written review of `src/REVIEW_ME.tsx` with severity ratings and reasoning
@@ -17,42 +24,51 @@ Your job is to demonstrate engineering judgment: find and fix bugs systematicall
 Three fixes describe the target scope, not a completion threshold. No additional
 features, shared-package technical plan, or fake API extensions are required.
 
-## Time Budget
+## Timebox
 
-Plan for **2–3 hours total**, including setup, investigation, implementation,
-and notes. Stop by three hours and submit what you have.
+Timebox your work to **2–3 hours**, including setup, investigation,
+implementation, and notes. Stop by three hours and submit what you have.
+**Full completion is not expected. An honest thinking log is more valuable
+than completing every task without transparency.**
 
-**Full completion is not expected. An honest partial answer is better than a
-complete answer that you cannot explain.** Record blockers, hypotheses,
-unsuccessful attempts, and unfinished work.
+## Submission
 
-## Deliverables
+Clone the assignment repository into your account and submit your public
+cloned repository (or a patch), with code changes to the extent reached
+within the timebox. Do not send exercise solutions as pull requests to the
+upstream repository.
 
-Submit a public clone of the repository (or a patch), with the following files
-to the extent reached within the timebox. Do not send exercise solutions as
-pull requests to the upstream repository.
+Include concise notes in `NOTES.md` (alternatively an **optional screen
+recording with your voice comments**) covering:
+
+- Starting repository; how to run your version.
+- Problems found, priorities, and root causes for changes you made.
+- Reproduction steps and tests or manual checks, including results.
+- Assumptions, rejected alternatives, deliberate omissions, and next steps with another day.
+- Time spent and an honest thinking log: what you noticed, tried, learned, changed your mind about, and left unfinished. Include failed attempts, blockers, and uncertainty. For AI/tool use, explain what you delegated, accepted or rejected, and how you checked it. Brief chronological notes are enough; full chat transcripts are not required.
+
+### Frontend deliverables
+
+Submit these files to the extent reached within the timebox:
 
 | File | What to include |
-|------|----------------|
-| `BUGS.md` | Bugs found with: root cause explanation, reproduction steps, your fix, and before/after test cases |
-| `REVIEW.md` | Written review of `REVIEW_ME.tsx` with severity ratings for each issue found |
-| `DECISIONS.md` | How you resolve each contradiction in `BRIEF.md`, with reasoning |
-| Code changes | Your focused fixes and tests |
-| `NOTES.md` | Time spent and a brief chronological thinking log: attempts, blockers, priorities, assumptions, rejected alternatives, remaining work, and AI/tool use with how you checked the results. Full chat transcripts are not required. |
-| Screen recording | **Optional.** You may use a recording with voice comments instead of the thinking log in `NOTES.md`. Show your working process, not just a demo. |
+| --- | --- |
+| `BUGS.md` | Root causes, reproduction steps, fixes, and before/after tests or manual checks with results |
+| `REVIEW.md` | Review of `src/REVIEW_ME.tsx` with severity ratings and reasoning |
+| `DECISIONS.md` | How you resolve the contradictions in `BRIEF.md`, with reasoning |
 
-## Scoring
+The optional recording can replace the thinking log in `NOTES.md`; the
+frontend review and decision documents remain part of the target scope.
 
-We evaluate your submission across these dimensions:
+## Assessment and follow-up
 
-| Dimension | Weight | What we look for |
-|-----------|--------|-----------------|
-| Bug diagnosis quality | 25% | Root cause accuracy, systematic approach, reproduction steps |
-| Code review depth | 20% | Finding real issues, severity calibration, actionable feedback |
-| Decision document | 20% | Noticed contradictions, defensible tradeoffs, clear reasoning |
-| Implementation quality | 15% | Correctness, edge case handling, clean code |
-| Test quality | 10% | Tests cover actual risk areas, not just happy paths |
-| Communication | 10% | Tradeoff clarity, self-assessment honesty, writing quality |
+We assess substantive scope and reasoning, not setup effort or unfamiliar
+tooling alone. If setup consumes the timebox, document the blocker and your
+approach rather than spending extra unpaid time.
+
+In the follow-up interview, be ready to show the changed behavior and explain
+a root cause. We assess your reasoning and understanding of the submitted
+code, not your ability to recite an upstream answer.
 
 ## Getting Started
 
@@ -75,8 +91,5 @@ The app runs at `http://localhost:5173`. The fake API has randomized latency (15
 
 ## Notes
 
-- Keep to the **2–3-hour timebox**; setup and documentation count toward it.
-- If you choose to record, work naturally and narrate your thinking; recording is not required.
 - If you find more than three bugs, document them. Fixing fewer bugs well is better than fixing many bugs poorly.
-- AI tools are allowed. Be ready to explain your reasoning and how you verified your findings and code changes in a follow-up call.
-- The fake API resets on page refresh. This is by design, not a bug.
+- The fake API resets on page refresh. This is documented behavior, not a bug; explain why you consider other reported behavior a bug.
