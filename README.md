@@ -8,42 +8,38 @@ Your job is to demonstrate engineering judgment: find and fix bugs systematicall
 
 **You are expected to use whatever tools you normally use**, including AI coding assistants. How you direct and evaluate automated work is part of what we're assessing.
 
-## Scope Tiers
+## Scope — Tier 1: Core only
 
-Tier 1 is the minimum. Higher tiers earn additional consideration in our evaluation.
+- Investigate and aim to fix the **3 most critical bugs** you find in the application
+- Submit a written review of `src/REVIEW_ME.tsx` with severity ratings and reasoning
+- Submit a decision document resolving the contradictions in `BRIEF.md`, with reasoning
 
-### Tier 1: Core
-*Sufficient to pass.*
+Three fixes describe the target scope, not a completion threshold. No additional
+features, shared-package technical plan, or fake API extensions are required.
 
-- Fix the **3 most critical bugs** you find in the application
-- Submit a written review of `src/REVIEW_ME.tsx` with severity ratings
-- Submit a decision document resolving the contradictions in `BRIEF.md`
-- Screen recording of your working session (5 minutes max)
+## Time Budget
 
-### Tier 2: Extended
+Plan for **2–3 hours total**, including setup, investigation, implementation,
+and notes. Stop by three hours and submit what you have.
 
-Everything in Tier 1, plus:
-
-- Implement **one new feature** of your choice that demonstrates agent-directed development
-- Screen recording of your working session (10 minutes max)
-
-### Tier 3: Full
-
-Everything in Tier 2, plus:
-
-- Write a short technical plan for extracting this app into a shared package with a real GraphQL backend
-- Extend the fake API with a new capability and demonstrate it
-- Screen recording of your working session (15 minutes max)
+**Full completion is not expected. An honest partial answer is better than a
+complete answer that you cannot explain.** Record blockers, hypotheses,
+unsuccessful attempts, and unfinished work.
 
 ## Deliverables
+
+Submit a public clone of the repository (or a patch), with the following files
+to the extent reached within the timebox. Do not send exercise solutions as
+pull requests to the upstream repository.
 
 | File | What to include |
 |------|----------------|
 | `BUGS.md` | Bugs found with: root cause explanation, reproduction steps, your fix, and before/after test cases |
 | `REVIEW.md` | Written review of `REVIEW_ME.tsx` with severity ratings for each issue found |
 | `DECISIONS.md` | How you resolve each contradiction in `BRIEF.md`, with reasoning |
-| Code changes | Committed to this repo |
-| Screen recording | **Required for all tiers.** Show your working process — how you find bugs, how you use tools, how you make decisions. This is not a demo; it's a window into how you work. |
+| Code changes | Your focused fixes and tests |
+| `NOTES.md` | Time spent and a brief chronological thinking log: attempts, blockers, priorities, assumptions, rejected alternatives, remaining work, and AI/tool use with how you checked the results. Full chat transcripts are not required. |
+| Screen recording | **Optional.** You may use a recording with voice comments instead of the thinking log in `NOTES.md`. Show your working process, not just a demo. |
 
 ## Scoring
 
@@ -79,7 +75,8 @@ The app runs at `http://localhost:5173`. The fake API has randomized latency (15
 
 ## Notes
 
-- There is no time limit. The scope tiers replace time-boxing.
-- The screen recording is how we see your process. Don't rehearse it — just work naturally and narrate your thinking.
-- If you find more bugs than the 3 required for Tier 1, document them. Finding more is a positive signal, but fixing fewer bugs well is better than fixing many bugs poorly.
+- Keep to the **2–3-hour timebox**; setup and documentation count toward it.
+- If you choose to record, work naturally and narrate your thinking; recording is not required.
+- If you find more than three bugs, document them. Fixing fewer bugs well is better than fixing many bugs poorly.
+- AI tools are allowed. Be ready to explain your reasoning and how you verified your findings and code changes in a follow-up call.
 - The fake API resets on page refresh. This is by design, not a bug.
