@@ -7,12 +7,12 @@ import { useState } from 'react';
 export function TicketDetailPage() {
   const { ticketId } = useParams();
   const numericId = Number(ticketId);
-  const { ticket, loading, error, refetch } = useTicket(numericId);
-  const { users } = useUsers();
+  const { ticket, setTicket, loading, error } = useTicket(numericId);
+  const { users, error: usersError, refetch: refetchUsers } = useUsers();
   const [mutating, setMutating] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
 
-  if (isNaN(numericId)) {
+  if (!Number.isInteger(numericId)) {
     throw new Error('Invalid ticket ID');
   }
 
@@ -48,13 +48,16 @@ export function TicketDetailPage() {
   const assignee = ticket.assigneeId !== null
     ? users.find((u) => u.id === ticket.assigneeId)
     : null;
+  const assigneeLabel = ticket.assigneeId === null
+    ? 'Unassigned'
+    : assignee?.name ?? `User #${ticket.assigneeId}`;
 
   const handleAssign = async (userId: number) => {
     setMutating(true);
     setMutationError(null);
     try {
-      await demoApi.assignTicket(ticket.id, userId);
-      refetch();
+      // Use the server-confirmed ticket instead of refetching
+      setTicket(await demoApi.assignTicket(ticket.id, userId));
     } catch (err) {
       setMutationError(err instanceof Error ? err.message : 'Failed to assign');
     } finally {
@@ -66,8 +69,7 @@ export function TicketDetailPage() {
     setMutating(true);
     setMutationError(null);
     try {
-      await demoApi.updateTicketStatus(ticket.id, !ticket.completed);
-      refetch();
+      setTicket(await demoApi.updateTicketStatus(ticket.id, !ticket.completed));
     } catch (err) {
       setMutationError(err instanceof Error ? err.message : 'Failed to update');
     } finally {
@@ -84,7 +86,7 @@ export function TicketDetailPage() {
         <dt>Status</dt>
         <dd>{ticket.completed ? 'Completed' : 'Open'}</dd>
         <dt>Assignee</dt>
-        <dd>{assignee ? assignee.name : 'Unassigned'}</dd>
+        <dd>{assigneeLabel}</dd>
       </dl>
 
       <div>
@@ -104,7 +106,8 @@ export function TicketDetailPage() {
             }}
             disabled={mutating}
           >
-            <option value="">Unassigned</option>
+            {/* The API has no "unassign" operation, so this can't be picked once assigned */}
+            <option value="" disabled={ticket.assigneeId !== null}>Unassigned</option>
             {users.map((user) => (
               <option key={user.id} value={user.id}>
                 {user.name}
@@ -114,6 +117,12 @@ export function TicketDetailPage() {
         </label>
       </div>
 
+      {usersError && (
+        <p role="alert">
+          Failed to load users.{' '}
+          <button type="button" onClick={refetchUsers}>Retry</button>
+        </p>
+      )}
       {mutationError && <p role="alert">{mutationError}</p>}
 
       <p><Link to="/">Back to list</Link></p>

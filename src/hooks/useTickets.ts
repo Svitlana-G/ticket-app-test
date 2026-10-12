@@ -1,16 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Ticket } from '../lib/types';
 import { demoApi } from '../lib/fakeApi';
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 export function useTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [assigneeFilter, setAssigneeFilter] = useState<number | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    const timerId = window.setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timerId);
+  }, [search]);
+
+  // Stable between renders; only changes when the applied filters change.
+  const refetch = useCallback(() => {
+    // Cancel any in-flight request so a stale response can't overwrite a newer one
+    controllerRef.current?.abort();
     const controller = new AbortController();
     controllerRef.current = controller;
 
@@ -21,8 +32,8 @@ export function useTickets() {
       .then((data) => {
         // Apply filters client-side after fetch
         const filtered = data.filter((ticket) => {
-          const matchesSearch = search === '' ||
-            ticket.description.toLowerCase().includes(search.toLowerCase());
+          const matchesSearch = debouncedSearch === '' ||
+            ticket.description.toLowerCase().includes(debouncedSearch.toLowerCase());
           const matchesAssignee = assigneeFilter === null ||
             ticket.assigneeId === assigneeFilter;
           return matchesSearch && matchesAssignee;
@@ -35,35 +46,12 @@ export function useTickets() {
         setError(err.message);
         setLoading(false);
       });
+  }, [debouncedSearch, assigneeFilter]);
 
-    return () => controller.abort();
-  }, [search, assigneeFilter]);
-
-  const refetch = () => {
-    const controller = new AbortController();
-    controllerRef.current = controller;
-
-    setLoading(true);
-    setError(null);
-
-    demoApi.listTickets({ signal: controller.signal })
-      .then((data) => {
-        const filtered = data.filter((ticket) => {
-          const matchesSearch = search === '' ||
-            ticket.description.toLowerCase().includes(search.toLowerCase());
-          const matchesAssignee = assigneeFilter === null ||
-            ticket.assigneeId === assigneeFilter;
-          return matchesSearch && matchesAssignee;
-        });
-        setTickets(filtered);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (err.name === 'AbortError') return;
-        setError(err.message);
-        setLoading(false);
-      });
-  };
+  useEffect(() => {
+    refetch();
+    return () => controllerRef.current?.abort();
+  }, [refetch]);
 
   return {
     tickets,

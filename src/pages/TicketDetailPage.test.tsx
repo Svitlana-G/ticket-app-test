@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RouterProvider } from 'react-router-dom';
@@ -50,5 +51,28 @@ describe('TicketDetailPage', () => {
     await waitFor(() => {
       expect(screen.getAllByText(/victor/i).length).toBeGreaterThanOrEqual(1);
     });
+  });
+
+  it('loads the ticket under StrictMode (effects run twice)', async () => {
+    const router = createTestRouter(['/tickets/1']);
+    render(
+      <StrictMode>
+        <RouterProvider router={router} />
+      </StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Install a monitor arm')).toBeInTheDocument();
+    });
+  });
+
+  it('shows the route error fallback for an invalid ticket ID', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const router = createTestRouter(['/tickets/abc']);
+    render(<RouterProvider router={router} />);
+
+    expect(await screen.findByText('Invalid ticket ID')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to list/i })).toBeInTheDocument();
+    vi.restoreAllMocks();
   });
 });

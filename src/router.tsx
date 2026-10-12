@@ -1,5 +1,6 @@
 import { createBrowserRouter, createMemoryRouter, RouteObject } from 'react-router-dom';
 import { App } from './App';
+import { RouteErrorFallback } from './components/RouteErrorFallback';
 import { TicketDetailPage } from './pages/TicketDetailPage';
 import { TicketsListPage } from './pages/TicketsListPage';
 export function buildAppRoutes(): RouteObject[] {
@@ -9,12 +10,18 @@ export function buildAppRoutes(): RouteObject[] {
       element: <App />,
       children: [
         {
-          index: true,
-          element: <TicketsListPage />,
-        },
-        {
-          path: 'tickets/:ticketId',
-          element: <TicketDetailPage />,
+          // Render route errors (e.g. an invalid ticket ID) inside the app layout
+          errorElement: <RouteErrorFallback />,
+          children: [
+            {
+              index: true,
+              element: <TicketsListPage />,
+            },
+            {
+              path: 'tickets/:ticketId',
+              element: <TicketDetailPage />,
+            },
+          ],
         },
       ],
     },

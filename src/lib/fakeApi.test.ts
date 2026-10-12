@@ -55,4 +55,14 @@ describe('fake ticketing api', () => {
     await expectation;
     vi.useRealTimers();
   });
+
+  it('assigns new tickets an ID that does not collide with seeded tickets', async () => {
+    const api = createFakeTicketingApi({ delayRangeMs: [0, 0], failureRate: 0 });
+
+    const created = await api.createTicket({ description: 'New ticket' });
+    const ids = (await api.listTickets()).map((ticket) => ticket.id);
+
+    expect(created.id).toBe(4);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
 });
