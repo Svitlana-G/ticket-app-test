@@ -1,7 +1,7 @@
-import { createFakeTicketingApi } from './fakeApi';
+import { createFakeTicketingApi } from "./fakeApi";
 
-describe('fake ticketing api', () => {
-  it('returns seeded tickets after the configured delay', async () => {
+describe("fake ticketing api", () => {
+  it("returns seeded tickets after the configured delay", async () => {
     vi.useFakeTimers();
 
     const api = createFakeTicketingApi({
@@ -18,7 +18,7 @@ describe('fake ticketing api', () => {
     vi.useRealTimers();
   });
 
-  it('can be configured to fail deterministically', async () => {
+  it("can be configured to fail deterministically", async () => {
     vi.useFakeTimers();
 
     const api = createFakeTicketingApi({
@@ -28,7 +28,9 @@ describe('fake ticketing api', () => {
     });
 
     const response = api.listUsers();
-    const expectation = expect(response).rejects.toThrow('Fake API request failed');
+    const expectation = expect(response).rejects.toThrow(
+      "Fake API request failed",
+    );
 
     await vi.advanceTimersByTimeAsync(10);
 
@@ -36,7 +38,7 @@ describe('fake ticketing api', () => {
     vi.useRealTimers();
   });
 
-  it('supports request cancellation via abort signals', async () => {
+  it("supports request cancellation via abort signals", async () => {
     vi.useFakeTimers();
 
     const api = createFakeTicketingApi({
@@ -47,12 +49,38 @@ describe('fake ticketing api', () => {
 
     const abortController = new AbortController();
     const response = api.listTickets({ signal: abortController.signal });
-    const expectation = expect(response).rejects.toMatchObject({ name: 'AbortError' });
+    const expectation = expect(response).rejects.toMatchObject({
+      name: "AbortError",
+    });
 
     abortController.abort();
     await vi.runAllTimersAsync();
 
     await expectation;
+    vi.useRealTimers();
+  });
+
+  it("assigns new tickets an ID that does not collide with existing ones", async () => {
+    vi.useFakeTimers();
+
+    const api = createFakeTicketingApi({
+      delayRangeMs: [10, 10],
+      failureRate: 0,
+      random: () => 0.5,
+    });
+
+    const creation = api.createTicket({ description: "New ticket" });
+    await vi.advanceTimersByTimeAsync(10);
+    const created = await creation;
+
+    const listing = api.listTickets();
+    await vi.advanceTimersByTimeAsync(10);
+    const all = await listing;
+
+    const ids = all.map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length); // all IDs are unique
+    expect(created.id).toBe(4); // max seed ID (3) + 1
+
     vi.useRealTimers();
   });
 });

@@ -1,4 +1,4 @@
-import { CreateTicketInput, Ticket, User } from './types';
+import { CreateTicketInput, Ticket, User } from "./types";
 
 type FakeApiOptions = {
   seedUsers?: User[];
@@ -16,8 +16,15 @@ export type TicketingApi = {
   listUsers(options?: RequestOptions): Promise<User[]>;
   listTickets(options?: RequestOptions): Promise<Ticket[]>;
   getTicket(ticketId: number, options?: RequestOptions): Promise<Ticket>;
-  createTicket(input: CreateTicketInput, options?: RequestOptions): Promise<Ticket>;
-  assignTicket(ticketId: number, userId: number, options?: RequestOptions): Promise<Ticket>;
+  createTicket(
+    input: CreateTicketInput,
+    options?: RequestOptions,
+  ): Promise<Ticket>;
+  assignTicket(
+    ticketId: number,
+    userId: number,
+    options?: RequestOptions,
+  ): Promise<Ticket>;
   updateTicketStatus(
     ticketId: number,
     completed: boolean,
@@ -25,24 +32,27 @@ export type TicketingApi = {
   ): Promise<Ticket>;
 };
 
-const defaultUsers: User[] = [{ id: 111, name: 'Victor' }, { id: 222, name: 'Priya' }];
+const defaultUsers: User[] = [
+  { id: 111, name: "Victor" },
+  { id: 222, name: "Priya" },
+];
 
 const defaultTickets: Ticket[] = [
   {
     id: 1,
-    description: 'Install a monitor arm',
+    description: "Install a monitor arm",
     assigneeId: 111,
     completed: false,
   },
   {
     id: 2,
-    description: 'Move the desk to the new location',
+    description: "Move the desk to the new location",
     assigneeId: 222,
     completed: false,
   },
   {
     id: 3,
-    description: 'Replace the office keyboard',
+    description: "Replace the office keyboard",
     assigneeId: null,
     completed: true,
   },
@@ -61,7 +71,7 @@ function createError(message: string) {
 }
 
 function createAbortError() {
-  return new DOMException('The operation was aborted', 'AbortError');
+  return new DOMException("The operation was aborted", "AbortError");
 }
 
 export function createFakeTicketingApi({
@@ -73,7 +83,7 @@ export function createFakeTicketingApi({
 }: FakeApiOptions = {}): TicketingApi {
   const users = seedUsers.map(cloneUser);
   const tickets = seedTickets.map(cloneTicket);
-  let lastId = 2;
+  let lastId = tickets.reduce((maxId, ticket) => Math.max(maxId, ticket.id), 0);
 
   const nextDelay = () => {
     const [minDelay, maxDelay] = delayRangeMs;
@@ -92,21 +102,21 @@ export function createFakeTicketingApi({
 
     await new Promise<void>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
-        signal?.removeEventListener('abort', handleAbort);
+        signal?.removeEventListener("abort", handleAbort);
         resolve();
       }, nextDelay());
 
       const handleAbort = () => {
         window.clearTimeout(timerId);
-        signal?.removeEventListener('abort', handleAbort);
+        signal?.removeEventListener("abort", handleAbort);
         reject(createAbortError());
       };
 
-      signal?.addEventListener('abort', handleAbort, { once: true });
+      signal?.addEventListener("abort", handleAbort, { once: true });
     });
 
     if (shouldFail()) {
-      throw createError('Fake API request failed');
+      throw createError("Fake API request failed");
     }
 
     return factory();
@@ -116,7 +126,7 @@ export function createFakeTicketingApi({
     const ticket = tickets.find((item) => item.id === ticketId);
 
     if (!ticket) {
-      throw createError('Ticket not found');
+      throw createError("Ticket not found");
     }
 
     return ticket;
@@ -126,7 +136,7 @@ export function createFakeTicketingApi({
     const user = users.find((item) => item.id === userId);
 
     if (!user) {
-      throw createError('User not found');
+      throw createError("User not found");
     }
 
     return user;
@@ -134,7 +144,8 @@ export function createFakeTicketingApi({
 
   return {
     listUsers: (options) => withDelay(() => users.map(cloneUser), options),
-    listTickets: (options) => withDelay(() => tickets.map(cloneTicket), options),
+    listTickets: (options) =>
+      withDelay(() => tickets.map(cloneTicket), options),
     getTicket: (ticketId, options) =>
       withDelay(() => cloneTicket(requireTicket(ticketId)), options),
     createTicket: ({ description }, options) =>
