@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { Ticket, User } from '../lib/types';
+import { Link, useLocation } from "react-router-dom";
+import { Ticket, User } from "../lib/types";
 
 type TicketRowProps = {
   ticket: Ticket;
@@ -8,18 +8,26 @@ type TicketRowProps = {
   pending?: boolean;
 };
 
-export function TicketRow({ ticket, users, onToggleStatus, pending = false }: TicketRowProps) {
+export function TicketRow({
+  ticket,
+  users,
+  onToggleStatus,
+  pending = false,
+}: TicketRowProps) {
   const assignee = users.find((u) => u.id === ticket.assigneeId);
-  const assigneeLabel = ticket.assigneeId === null
-    ? 'Unassigned'
-    : assignee?.name ?? `User #${ticket.assigneeId}`;
+  const assigneeLabel =
+    ticket.assigneeId === null
+      ? "Unassigned"
+      : (assignee?.name ?? `User #${ticket.assigneeId}`);
+
+  const location = useLocation();
 
   return (
     <li>
       <p>
         <strong>{ticket.description}</strong>
       </p>
-      <p>Status: {ticket.completed ? 'Completed' : 'Open'}</p>
+      <p>Status: {ticket.completed ? "Completed" : "Open"}</p>
       <p>Assignee: {assigneeLabel}</p>
       <p>
         <button
@@ -27,9 +35,14 @@ export function TicketRow({ ticket, users, onToggleStatus, pending = false }: Ti
           onClick={() => onToggleStatus(ticket.id, !ticket.completed)}
           disabled={pending}
         >
-          {ticket.completed ? 'Reopen' : 'Complete'}
-        </button>{' '}
-        <Link to={`/tickets/${ticket.id}`}>View details</Link>
+          {ticket.completed ? "Reopen" : "Complete"}
+        </button>{" "}
+        <Link
+          to={`/tickets/${ticket.id}`}
+          state={{ listSearch: location.search }}
+        >
+          View details
+        </Link>
       </p>
     </li>
   );

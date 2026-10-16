@@ -1,8 +1,8 @@
-import { Link, useParams } from 'react-router-dom';
-import { useTicket } from '../hooks/useTicket';
-import { useUsers } from '../hooks/useUsers';
-import { demoApi } from '../lib/fakeApi';
-import { useState } from 'react';
+import { Link, useLocation, useParams } from "react-router-dom";
+import { useTicket } from "../hooks/useTicket";
+import { useUsers } from "../hooks/useUsers";
+import { demoApi } from "../lib/fakeApi";
+import { useState } from "react";
 
 export function TicketDetailPage() {
   const { ticketId } = useParams();
@@ -11,9 +11,18 @@ export function TicketDetailPage() {
   const { users, error: usersError, refetch: refetchUsers } = useUsers();
   const [mutating, setMutating] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
+  const location = useLocation();
+  const listSearch =
+    (location.state as { listSearch?: string } | null)?.listSearch ?? "";
+
+  const backLink = (
+    <p>
+      <Link to={{ pathname: "/", search: listSearch }}>Back to list</Link>
+    </p>
+  );
 
   if (!Number.isInteger(numericId)) {
-    throw new Error('Invalid ticket ID');
+    throw new Error("Invalid ticket ID");
   }
 
   if (loading) {
@@ -30,7 +39,7 @@ export function TicketDetailPage() {
       <section>
         <h2>Ticket details</h2>
         <p role="alert">Error: {error}</p>
-        <p><Link to="/">Back to list</Link></p>
+        {backLink}
       </section>
     );
   }
@@ -40,17 +49,19 @@ export function TicketDetailPage() {
       <section>
         <h2>Ticket details</h2>
         <p>Ticket not found</p>
-        <p><Link to="/">Back to list</Link></p>
+        {backLink}
       </section>
     );
   }
 
-  const assignee = ticket.assigneeId !== null
-    ? users.find((u) => u.id === ticket.assigneeId)
-    : null;
-  const assigneeLabel = ticket.assigneeId === null
-    ? 'Unassigned'
-    : assignee?.name ?? `User #${ticket.assigneeId}`;
+  const assignee =
+    ticket.assigneeId !== null
+      ? users.find((u) => u.id === ticket.assigneeId)
+      : null;
+  const assigneeLabel =
+    ticket.assigneeId === null
+      ? "Unassigned"
+      : (assignee?.name ?? `User #${ticket.assigneeId}`);
 
   const handleAssign = async (userId: number) => {
     setMutating(true);
@@ -59,7 +70,7 @@ export function TicketDetailPage() {
       // Use the server-confirmed ticket instead of refetching
       setTicket(await demoApi.assignTicket(ticket.id, userId));
     } catch (err) {
-      setMutationError(err instanceof Error ? err.message : 'Failed to assign');
+      setMutationError(err instanceof Error ? err.message : "Failed to assign");
     } finally {
       setMutating(false);
     }
@@ -71,7 +82,7 @@ export function TicketDetailPage() {
     try {
       setTicket(await demoApi.updateTicketStatus(ticket.id, !ticket.completed));
     } catch (err) {
-      setMutationError(err instanceof Error ? err.message : 'Failed to update');
+      setMutationError(err instanceof Error ? err.message : "Failed to update");
     } finally {
       setMutating(false);
     }
@@ -84,30 +95,28 @@ export function TicketDetailPage() {
         <dt>Description</dt>
         <dd>{ticket.description}</dd>
         <dt>Status</dt>
-        <dd>{ticket.completed ? 'Completed' : 'Open'}</dd>
+        <dd>{ticket.completed ? "Completed" : "Open"}</dd>
         <dt>Assignee</dt>
         <dd>{assigneeLabel}</dd>
       </dl>
 
       <div>
-        <button
-          type="button"
-          onClick={handleToggleStatus}
-          disabled={mutating}
-        >
-          {ticket.completed ? 'Reopen' : 'Complete'}
-        </button>{' '}
+        <button type="button" onClick={handleToggleStatus} disabled={mutating}>
+          {ticket.completed ? "Reopen" : "Complete"}
+        </button>{" "}
         <label>
-          Assign to{' '}
+          Assign to{" "}
           <select
-            value={ticket.assigneeId ?? ''}
+            value={ticket.assigneeId ?? ""}
             onChange={(e) => {
               if (e.target.value) handleAssign(Number(e.target.value));
             }}
             disabled={mutating}
           >
             {/* The API has no "unassign" operation, so this can't be picked once assigned */}
-            <option value="" disabled={ticket.assigneeId !== null}>Unassigned</option>
+            <option value="" disabled={ticket.assigneeId !== null}>
+              Unassigned
+            </option>
             {users.map((user) => (
               <option key={user.id} value={user.id}>
                 {user.name}
@@ -119,13 +128,14 @@ export function TicketDetailPage() {
 
       {usersError && (
         <p role="alert">
-          Failed to load users.{' '}
-          <button type="button" onClick={refetchUsers}>Retry</button>
+          Failed to load users.{" "}
+          <button type="button" onClick={refetchUsers}>
+            Retry
+          </button>
         </p>
       )}
       {mutationError && <p role="alert">{mutationError}</p>}
-
-      <p><Link to="/">Back to list</Link></p>
+      {backLink}
     </section>
   );
 }
