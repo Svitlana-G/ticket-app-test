@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider } from "react-router-dom";
 import { createTestRouter } from "../router";
+import { within } from "@testing-library/react";
 
 vi.mock("../lib/fakeApi", async () => {
   const actual =
@@ -88,12 +89,12 @@ describe("TicketDetailPage", () => {
     const router = createTestRouter(["/?assignee=111"]);
     render(<RouterProvider router={router} />);
 
-    // Only Victor's ticket is listed
-    await user.click(
-      await screen.findByRole("link", { name: /view details/i }),
-    );
+    const row = (await screen.findByText("Install a monitor arm")).closest(
+      "li",
+    )!;
+    await user.click(within(row).getByRole("link", { name: /view details/i }));
 
-    await screen.findByText("Install a monitor arm");
+    await screen.findByText("Open");
 
     expect(screen.getByRole("link", { name: /back to list/i })).toHaveAttribute(
       "href",
